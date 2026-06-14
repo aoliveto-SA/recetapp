@@ -105,21 +105,27 @@ function calcRecipe(recipe, ingredients, business) {
 
 // ─── EXPORT CSV ───────────────────────────────────────────────────────────────
 function exportCSV(recipes, ingredients, business) {
-  let csv = "COSTEO DE RECETAS\n\n";
+  // Punto y coma como separador para Excel en español/latinoamérica
+  const S = ";";
+  const n = (v) => v.toString().replace(".", ","); // decimales con coma
+  let csv = "sep=;\n"; // indica a Excel el separador
+  csv += `COSTEO DE RECETAS\n\n`;
   recipes.forEach(r => {
     const c = calcRecipe(r, ingredients, business);
-    csv += `RECETA:,${r.name}\nCategoría:,${r.category}\nPorciones:,${r.portions}\n\n`;
-    csv += "Ingrediente,Unidad,Cantidad,Costo neto/u ($),Subtotal ($)\n";
+    csv += `RECETA${S}${r.name}\n`;
+    csv += `Categoría${S}${r.category}\n`;
+    csv += `Porciones${S}${r.portions}\n\n`;
+    csv += `Ingrediente${S}Unidad${S}Cantidad${S}Costo neto/u ($)${S}Subtotal ($)\n`;
     c.lines.forEach(l => {
-      csv += `${l.ing.name},${l.ing.unit},${l.qty.toFixed(3)},${l.unitCost.toFixed(4)},${l.subtotal.toFixed(2)}\n`;
+      csv += `${l.ing.name}${S}${l.ing.unit}${S}${n(l.qty.toFixed(3))}${S}${n(l.unitCost.toFixed(4))}${S}${n(l.subtotal.toFixed(2))}\n`;
     });
-    csv += `\nCosto MP total,,,,${c.mpTotal.toFixed(2)}\n`;
-    csv += `Costo MP x porción,,,,${c.mpPerPortion.toFixed(2)}\n`;
-    csv += `Costo fijo x porción,,,,${c.cfPerUnit.toFixed(2)}\n`;
-    csv += `Costos variables (${(c.varPct*100).toFixed(1)}%),,,,${c.varCost.toFixed(2)}\n`;
-    csv += `COSTO TOTAL x porción,,,,${c.totalCost.toFixed(2)}\n`;
-    csv += `PRECIO REDONDEADO,,,,${c.roundedPrice.toFixed(2)}\n`;
-    csv += `Ganancia real %,,,,${c.realProfitPct.toFixed(1)}%\n\n\n`;
+    csv += `\nCosto MP total${S}${S}${S}${S}${n(c.mpTotal.toFixed(2))}\n`;
+    csv += `Costo MP x porción${S}${S}${S}${S}${n(c.mpPerPortion.toFixed(2))}\n`;
+    csv += `Costo fijo x porción${S}${S}${S}${S}${n(c.cfPerUnit.toFixed(2))}\n`;
+    csv += `Costos variables (${n((c.varPct*100).toFixed(1))}%)${S}${S}${S}${S}${n(c.varCost.toFixed(2))}\n`;
+    csv += `COSTO TOTAL x porción${S}${S}${S}${S}${n(c.totalCost.toFixed(2))}\n`;
+    csv += `PRECIO REDONDEADO${S}${S}${S}${S}${n(c.roundedPrice.toFixed(2))}\n`;
+    csv += `Ganancia real %${S}${S}${S}${S}${n(c.realProfitPct.toFixed(1))}%\n\n\n`;
   });
   const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
   const url  = URL.createObjectURL(blob);
