@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 
 // ─── STORAGE (localStorage para deploy standalone) ───────────────────────────
 const sget = (key) => {
